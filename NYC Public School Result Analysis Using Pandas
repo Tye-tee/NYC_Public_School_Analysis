@@ -1,0 +1,41 @@
+ import pandas as pd
+
+# Import the data
+schools = pd.read_csv("schools.csv")
+
+# Preview the data
+schools.head()
+
+# Which NYC schools have the best math results? 
+
+# Sort results by average_math, include school_name and average_math as columns and save to a dataframe called best_math_schools
+# index the dataframe
+# sort from largest to smallest
+
+best_math_schools = schools[schools["average_math"] >= 640][["school_name", "average_math"]].sort_values("average_math", ascending=False)
+
+# Combine the average of math, reading and writing and Calculate total_SAT per school
+schools["total_SAT"] = schools["average_math"] + schools["average_reading"] + schools["average_writing"]
+
+# What are the top 10 performing schools based on the combined SAT scores?
+# create the dataframe and order by total_SAT from largest to smallest 
+
+top_10_schools = schools.sort_values("total_SAT", ascending=False)[["school_name", "total_SAT"]].head(10)
+
+# Which single borough has the largest standard deviation in the combined SAT score?
+
+boroughs = schools.groupby("borough")["total_SAT"].agg(["count", "mean", "std"]).round(2)
+
+# Filter for max std and make borough a column
+largest_std_dev = boroughs[boroughs["std"] == boroughs["std"].max()]
+
+# Rename the columns for clarity
+largest_std_dev = largest_std_dev.rename(columns={"count": "num_schools", "mean": "average_SAT", "std": "std_SAT"})
+import matplotlib.pyplot as plt
+
+schools.boxplot(column="total_SAT", by="borough", figsize=(10,6))
+plt.title("Distribution of Total SAT Scores by Borough")
+plt.suptitle("")
+plt.ylabel("Total SAT Score")
+plt.xticks(rotation=45)
+plt.show()
